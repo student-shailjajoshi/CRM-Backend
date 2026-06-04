@@ -1,16 +1,40 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 
 app = FastAPI()
 
+customers = [
+    {"id": 1, "name":"Shailja"},
+    {"id":2, "name":"priya"}
+]
+
+class Customer(BaseModel):
+    id: int
+    name : str
+
+
+    
+
 @app.get("/")
-def root():
-    return {"message": "CRM Backend Running!"}
+def home():
+    return {"message":"CRM Backend"}
 
 @app.get("/customers")
 def get_customers():
-    customers = [
-        {"id": 1, "name": "Priya Sharma", "email": "priya@gmail.com", "status": "New"},
-        {"id": 2, "name": "Rahul Verma", "email": "rahul@gmail.com", "status": "Follow-up"},
-        {"id": 3, "name": "Sneha Gupta", "email": "sneha@gmail.com", "status": "Closed"},
-    ]
     return customers
+
+@app.get("/customers/{id}")
+def get_customers(id:int):
+
+    for customer in customers:
+        if customer["id"] == id:
+            return customer
+        
+    return {"message":"customer not found"}   
+ 
+@app.post("/customers")
+def create_customer(customer: Customer):
+    customers.append(
+        {"id": customer.id, "name": customer.name}
+    )
+    return customer
